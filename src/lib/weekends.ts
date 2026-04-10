@@ -5,29 +5,36 @@ export interface Weekend {
 
 export function getWeekendsBetween(startDate: string, endDate: string): Weekend[] {
   const weekends: Weekend[] = [];
-  const start = new Date(startDate + "T00:00:00");
-  const end = new Date(endDate + "T00:00:00");
+  
+  // Parse as UTC to avoid timezone shifts
+  const [startYear, startMonth, startDay] = startDate.split("-").map(Number);
+  const [endYear, endMonth, endDay] = endDate.split("-").map(Number);
+  
+  const start = new Date(Date.UTC(startYear, startMonth - 1, startDay));
+  const end = new Date(Date.UTC(endYear, endMonth - 1, endDay));
 
   const current = new Date(start);
   while (current <= end) {
-    if (current.getDay() === 6) {
+    if (current.getUTCDay() === 6) {
       const saturday = new Date(current);
       const sunday = new Date(current);
-      sunday.setDate(sunday.getDate() + 1);
-      const satMonth = saturday.toLocaleDateString("en-US", { month: "short" });
-      const sunMonth = sunday.toLocaleDateString("en-US", { month: "short" });
-      const satDay = saturday.getDate();
-      const sunDay = sunday.getDate();
+      sunday.setUTCDate(sunday.getUTCDate() + 1);
+      
+      const satMonth = saturday.toLocaleDateString("en-US", { month: "short", timeZone: "UTC" });
+      const sunMonth = sunday.toLocaleDateString("en-US", { month: "short", timeZone: "UTC" });
+      const satDay = saturday.getUTCDate();
+      const sunDay = sunday.getUTCDate();
+      
       const label =
         satMonth === sunMonth
           ? `${satMonth} ${satDay}-${sunDay}`
           : `${satMonth} ${satDay}-${sunMonth} ${sunDay}`;
       weekends.push({
-        saturday: saturday.toISOString().split("T")[0],
+        saturday: `${saturday.getUTCFullYear()}-${String(saturday.getUTCMonth() + 1).padStart(2, "0")}-${String(satDay).padStart(2, "0")}`,
         label,
       });
     }
-    current.setDate(current.getDate() + 1);
+    current.setUTCDate(current.getUTCDate() + 1);
   }
   return weekends;
 }

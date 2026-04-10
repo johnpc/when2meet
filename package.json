@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "prod-config": "npx ampx generate outputs --app-id d3o4vpko7uy94 --branch main --profile personal --region us-west-2"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.97.0",
